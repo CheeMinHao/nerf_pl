@@ -20,15 +20,15 @@ from losses import loss_dict
 from metrics import *
 
 # pytorch-lightning
-from lightning.pytorch.callbacks import ModelCheckpoint
-from lightning.pytorch import LightningModule, Trainer
-from lightning.pytorch.loggers import TensorBoardLogger
+from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning import LightningModule, Trainer
+from pytorch_lightning.loggers import TensorBoardLogger
 
 
 class NeRFSystem(LightningModule):
     def __init__(self, hparams):
         super(NeRFSystem, self).__init__()
-        self.hparams = hparams
+        self.save_hyperparameters(hparams)
 
         self.loss = loss_dict['nerfw'](coef=1)
 
