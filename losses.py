@@ -1,13 +1,26 @@
+# losses.py
 import torch
 from torch import nn
+from typing import Dict, Any, Union
+from torch import Tensor
 
 class ColorLoss(nn.Module):
-    def __init__(self, coef=1):
+    def __init__(self, coef: float = 1.0):
         super().__init__()
         self.coef = coef
         self.loss = nn.MSELoss(reduction='mean')
 
-    def forward(self, inputs, targets):
+    def forward(self, inputs: Dict[str, Tensor], targets: Tensor) -> Tensor:
+        """
+        Calculate color loss for NeRF outputs
+        
+        Args:
+            inputs: Dictionary containing rgb values
+            targets: Ground truth RGB values
+            
+        Returns:
+            Weighted loss value
+        """
         loss = self.loss(inputs['rgb_coarse'], targets)
         if 'rgb_fine' in inputs:
             loss += self.loss(inputs['rgb_fine'], targets)
@@ -24,30 +37,48 @@ class NerfWLoss(nn.Module):
         b_l: beta loss (2nd term in equation 13)
         s_l: sigma loss (3rd term in equation 13)
     """
-    def __init__(self, coef=1, lambda_u=0.01):
+    def __init__(self, coef: float = 1.0, lambda_u: float = 0.01):
         """
-        lambda_u: in equation 13
+        Args:
+            coef: Loss coefficient
+            lambda_u: Uncertainty lambda from equation 13
         """
         super().__init__()
         self.coef = coef
         self.lambda_u = lambda_u
 
-    def forward(self, inputs, targets):
-        ret = {}
-        ret['c_l'] = 0.5 * ((inputs['rgb_coarse']-targets)**2).mean()
+    def forward(self, inputs: Dict[str, Tensor], targets: Tensor) -> Dict[str, Tensor]:
+        """
+        Calculate NeRF-W losses
+        
+        Args:
+            inputs: Dictionary containing model outputs
+            targets: Ground truth values
+            
+        Returns:
+            Dictionary containing individual loss components
+        """
+        ret: Dict[str, Tensor] = {}
+        ret['c_l'] = 0.5 * torch.mean((inputs['rgb_coarse'] - targets)**2)
+        
         if 'rgb_fine' in inputs:
-            if 'beta' not in inputs: # no transient head, normal MSE loss
-                ret['f_l'] = 0.5 * ((inputs['rgb_fine']-targets)**2).mean()
+            if 'beta' not in inputs:  # no transient head, normal MSE loss
+                ret['f_l'] = 0.5 * torch.mean((inputs['rgb_fine'] - targets)**2)
             else:
-                ret['f_l'] = \
-                    ((inputs['rgb_fine']-targets)**2/(2*inputs['beta'].unsqueeze(1)**2)).mean()
-                ret['b_l'] = 3 + torch.log(inputs['beta']).mean() # +3 to make it positive
-                ret['s_l'] = self.lambda_u * inputs['transient_sigmas'].mean()
+                beta_expanded = inputs['beta'].unsqueeze(1)
+                ret['f_l'] = torch.mean(
+                    (inputs['rgb_fine'] - targets)**2 / (2 * beta_expanded**2)
+                )
+                ret['b_l'] = 3 + torch.mean(torch.log(inputs['beta']))  # +3 to make it positive
+                ret['s_l'] = self.lambda_u * torch.mean(inputs['transient_sigmas'])
 
-        for k, v in ret.items():
-            ret[k] = self.coef * v
-
+        # Apply coefficient to all loss components
+        ret = {k: self.coef * v for k, v in ret.items()}
         return ret
 
-loss_dict = {'color': ColorLoss,
-             'nerfw': NerfWLoss}
+
+# Updated loss dictionary with type hint
+loss_dict: Dict[str, Any] = {
+    'color': ColorLoss,
+    'nerfw': NerfWLoss
+}

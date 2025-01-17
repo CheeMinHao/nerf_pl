@@ -22,7 +22,7 @@ from metrics import *
 # pytorch-lightning
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning import LightningModule, Trainer
-from pytorch_lightning.loggers import TestTubeLogger
+from pytorch_lightning.loggers import TensorBoardLogger
 
 
 class NeRFSystem(LightningModule):
@@ -189,14 +189,14 @@ def main(hparams):
                         mode='max',
                         save_top_k=-1)
 
-    logger = TestTubeLogger(save_dir="logs",
+    logger = TensorBoardLogger(save_dir="logs",
                             name=hparams.exp_name,
                             debug=False,
                             create_git_tag=False,
                             log_graph=False)
 
     trainer = Trainer(max_epochs=hparams.num_epochs,
-                      checkpoint_callback=checkpoint_callback,
+                      callbacks=checkpoint_callback,
                       resume_from_checkpoint=hparams.ckpt_path,
                       logger=logger,
                       weights_summary=None,
