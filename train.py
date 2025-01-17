@@ -27,7 +27,7 @@ from pytorch_lightning.loggers import TensorBoardLogger
 
 class NeRFSystem(LightningModule):
     def __init__(self, hparams):
-        super().__init__()
+        super(NeRFSystem, self).__init__()
         self.hparams = hparams
 
         self.loss = loss_dict['nerfw'](coef=1)
