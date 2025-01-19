@@ -197,11 +197,9 @@ def main(hparams):
 
     trainer = Trainer(max_epochs=hparams.num_epochs,
                       callbacks=checkpoint_callback,
-                    #   resume_from_checkpoint=hparams.ckpt_path,
+                      resume_from_checkpoint=hparams.ckpt_path,
                       logger=logger,
-                      weights_summary=None,
-                      progress_bar_refresh_rate=hparams.refresh_every,
-                      gpus=hparams.num_gpus,
+                      enable_progress_bar=True,
                       accelerator='ddp' if hparams.num_gpus>1 else None,
                       num_sanity_val_steps=1,
                       benchmark=True,
