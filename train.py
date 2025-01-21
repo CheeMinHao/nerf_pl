@@ -172,7 +172,7 @@ class NeRFSystem(LightningModule):
 
         return log
 
-    def validation_epoch_end(self, outputs):
+    def on_validation_epoch_end(self, outputs):
         mean_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
         mean_psnr = torch.stack([x['val_psnr'] for x in outputs]).mean()
 
@@ -197,10 +197,9 @@ def main(hparams):
 
     trainer = Trainer(max_epochs=hparams.num_epochs,
                       callbacks=checkpoint_callback,
-                      resume_from_checkpoint=hparams.ckpt_path,
                       logger=logger,
                       enable_progress_bar=True,
-                      accelerator='ddp' if hparams.num_gpus>1 else None,
+                      accelerator='gpu' if hparams.num_gpus>=1 else None,
                       num_sanity_val_steps=1,
                       benchmark=True,
                       profiler="simple" if hparams.num_gpus==1 else None)

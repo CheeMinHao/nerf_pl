@@ -90,10 +90,10 @@ def prepare_cache(config: CacheConfig) -> None:
         save_pickle(dataset.fars, config.cache_dir / 'fars.pkl')
         
         # Save rays and RGB values
-        save_numpy(dataset.all_rays.numpy(), 
-                  config.cache_dir / f'rays{config.img_downscale}.npy')
-        save_numpy(dataset.all_rgbs.numpy(), 
-                  config.cache_dir / f'rgbs{config.img_downscale}.npy')
+        save_numpy(dataset.all_rays.detach().cpu().numpy(), 
+          config.cache_dir / f'rays{config.img_downscale}.npy')
+        save_numpy(dataset.all_rgbs.detach().cpu().numpy(), 
+            config.cache_dir / f'rgbs{config.img_downscale}.npy')
         
         logging.info(f"Data cache saved to {config.cache_dir} !")
         
