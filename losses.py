@@ -3,7 +3,7 @@ import torch
 from torch import nn
 
 class ColorLoss(nn.Module):
-    def __init__(self, coef: float = 1.0):
+    def __init__(self, coef = 1.0):
         super().__init__()
         self.coef = coef
         self.loss = nn.MSELoss(reduction='mean')
@@ -35,7 +35,7 @@ class NerfWLoss(nn.Module):
         b_l: beta loss (2nd term in equation 13)
         s_l: sigma loss (3rd term in equation 13)
     """
-    def __init__(self, coef: float = 1.0, lambda_u: float = 0.01):
+    def __init__(self, coef = 1.0, lambda_u = 0.01):
         """
         Args:
             coef: Loss coefficient

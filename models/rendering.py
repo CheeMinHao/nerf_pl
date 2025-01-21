@@ -1,6 +1,5 @@
 import torch
 from einops import rearrange, reduce, repeat
-import torch.nn.functional as F  # Added for modern PyTorch practices
 
 __all__ = ['render_rays']
 

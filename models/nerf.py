@@ -1,6 +1,5 @@
 import torch
 from torch import nn
-import torch.nn.functional as F  # Added for modern PyTorch practices
 
 class PosEmbedding(nn.Module):
     def __init__(self, max_logscale, N_freqs, logscale=True, device=None):  # Added device parameter
