@@ -1,13 +1,8 @@
 # metrics.py
 import torch
-from torch import Tensor
-from typing import Optional, Union
 from kornia.losses import ssim as dssim
 
-def mse(image_pred: Tensor, 
-        image_gt: Tensor, 
-        valid_mask: Optional[Tensor] = None, 
-        reduction: str = 'mean') -> Tensor:
+def mse(image_pred, image_gt, valid_mask=None, reduction='mean'):
     """
     Calculate Mean Squared Error
 
@@ -27,10 +22,7 @@ def mse(image_pred: Tensor,
         return torch.mean(value)
     return value
 
-def psnr(image_pred: Tensor, 
-         image_gt: Tensor, 
-         valid_mask: Optional[Tensor] = None, 
-         reduction: str = 'mean') -> Tensor:
+def psnr(image_pred, image_gt, valid_mask = None, reduction: str = 'mean'):
     """
     Calculate Peak Signal-to-Noise Ratio
 
@@ -45,7 +37,7 @@ def psnr(image_pred: Tensor,
     """
     return -10 * torch.log10(mse(image_pred, image_gt, valid_mask, reduction))
 
-def ssim(image_pred: Tensor, image_gt: Tensor, reduction: str = 'mean') -> Tensor:
+def ssim(image_pred, image_gt, reduction = 'mean'):
     """
     Calculate Structural Similarity Index
 
@@ -61,6 +53,5 @@ def ssim(image_pred: Tensor, image_gt: Tensor, reduction: str = 'mean') -> Tenso
     dssim_value = dssim(image_pred, 
                         image_gt, 
                         window_size=3, 
-                        reduction=reduction,
-                        max_val=1.0)
+                        reduction=reduction)
     return 1 - 2 * dssim_value

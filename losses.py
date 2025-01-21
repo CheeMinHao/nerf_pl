@@ -1,8 +1,6 @@
 # losses.py
 import torch
 from torch import nn
-from typing import Dict, Any, Union
-from torch import Tensor
 
 class ColorLoss(nn.Module):
     def __init__(self, coef: float = 1.0):
@@ -10,7 +8,7 @@ class ColorLoss(nn.Module):
         self.coef = coef
         self.loss = nn.MSELoss(reduction='mean')
 
-    def forward(self, inputs: Dict[str, Tensor], targets: Tensor) -> Tensor:
+    def forward(self, inputs, targets):
         """
         Calculate color loss for NeRF outputs
         
@@ -47,7 +45,7 @@ class NerfWLoss(nn.Module):
         self.coef = coef
         self.lambda_u = lambda_u
 
-    def forward(self, inputs: Dict[str, Tensor], targets: Tensor) -> Dict[str, Tensor]:
+    def forward(self, inputs, targets):
         """
         Calculate NeRF-W losses
         
@@ -58,7 +56,7 @@ class NerfWLoss(nn.Module):
         Returns:
             Dictionary containing individual loss components
         """
-        ret: Dict[str, Tensor] = {}
+        ret = {}
         ret['c_l'] = 0.5 * torch.mean((inputs['rgb_coarse'] - targets)**2)
         
         if 'rgb_fine' in inputs:
@@ -78,7 +76,7 @@ class NerfWLoss(nn.Module):
 
 
 # Updated loss dictionary with type hint
-loss_dict: Dict[str, Any] = {
+loss_dict = {
     'color': ColorLoss,
     'nerfw': NerfWLoss
 }

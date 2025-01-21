@@ -191,8 +191,6 @@ def main(hparams):
 
     logger = TensorBoardLogger(save_dir="logs",
                             name=hparams.exp_name,
-                            debug=False,
-                            create_git_tag=False,
                             log_graph=False)
 
     trainer = Trainer(max_epochs=hparams.num_epochs,
