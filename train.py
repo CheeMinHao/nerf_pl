@@ -197,12 +197,21 @@ def main(hparams):
                       callbacks=checkpoint_callback,
                       logger=logger,
                       enable_progress_bar=True,
-                      accelerator='gpu' if hparams.num_gpus>=1 else None,
+                      accelerator='gpu' if hparams.num_gpus > 0 else 'cpu',
+                      devices=hparams.num_gpus if hparams.num_gpus > 0 else None,
+                      strategy='ddp' if hparams.num_gpus > 1 else None,
                       num_sanity_val_steps=1,
                       benchmark=True,
-                      profiler="simple" if hparams.num_gpus==1 else None)
+                      profiler="simple" if hparams.num_gpus==1 else None,
+                      precision='32',
+                      enable_model_summary=True,
+                      deterministic=False,
+                      log_every_n_steps=50)
 
-    trainer.fit(system)
+    if hparams.ckpt_path:
+        trainer.fit(system, ckpt_path=hparams.ckpt_path)
+    else:
+        trainer.fit(system)
 
 
 if __name__ == '__main__':
