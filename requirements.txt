@@ -6,6 +6,7 @@ kornia
 opencv-python
 matplotlib
 jupyter
+torch_optimizer
 
 # for mesh
 PyMCubes
