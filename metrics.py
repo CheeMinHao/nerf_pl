@@ -22,7 +22,7 @@ def mse(image_pred, image_gt, valid_mask=None, reduction='mean'):
         return torch.mean(value)
     return value
 
-def psnr(image_pred, image_gt, valid_mask = None, reduction: str = 'mean'):
+def psnr(image_pred, image_gt, valid_mask = None, reduction = 'mean'):
     """
     Calculate Peak Signal-to-Noise Ratio
 

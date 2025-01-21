@@ -29,6 +29,7 @@ class NeRFSystem(LightningModule):
     def __init__(self, hparams):
         super(NeRFSystem, self).__init__()
         self.save_hyperparameters(hparams)
+        self.validation_step_outputs = []
 
         self.loss = loss_dict['nerfw'](coef=1)
 
@@ -169,12 +170,13 @@ class NeRFSystem(LightningModule):
 
         psnr_ = psnr(results[f'rgb_{typ}'], rgbs)
         log['val_psnr'] = psnr_
+        self.validation_step_outputs.append(log)
 
         return log
 
-    def on_validation_epoch_end(self, outputs):
-        mean_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
-        mean_psnr = torch.stack([x['val_psnr'] for x in outputs]).mean()
+    def on_validation_epoch_end(self):
+        mean_loss = torch.stack([x['val_loss'] for x in self.validation_step_outputs]).mean()
+        mean_psnr = torch.stack([x['val_psnr'] for x in self.validation_step_outputs]).mean()
 
         self.log('val/loss', mean_loss)
         self.log('val/psnr', mean_psnr, prog_bar=True)
@@ -199,7 +201,7 @@ def main(hparams):
                       enable_progress_bar=True,
                       accelerator='gpu' if hparams.num_gpus > 0 else 'cpu',
                       devices=hparams.num_gpus if hparams.num_gpus > 0 else None,
-                      strategy='ddp' if hparams.num_gpus > 1 else None,
+                      strategy='ddp' if hparams.num_gpus > 0 else None,
                       num_sanity_val_steps=1,
                       benchmark=True,
                       profiler="simple" if hparams.num_gpus==1 else None,
