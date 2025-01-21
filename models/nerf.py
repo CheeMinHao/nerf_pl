@@ -36,8 +36,7 @@ class NeRF(nn.Module):
                  in_channels_xyz=63, in_channels_dir=27,
                  encode_appearance=False, in_channels_a=48,
                  encode_transient=False, in_channels_t=16,
-                 beta_min=0.03,
-                 device=None):  # Added device parameter
+                 beta_min=0.03):
         """
         [Previous docstring remains the same]
         """
@@ -48,7 +47,6 @@ class NeRF(nn.Module):
         self.skips = skips
         self.in_channels_xyz = in_channels_xyz
         self.in_channels_dir = in_channels_dir
-        self.device = device
 
         self.encode_appearance = False if typ=='coarse' else encode_appearance
         self.in_channels_a = in_channels_a if encode_appearance else 0
